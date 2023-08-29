@@ -1,0 +1,50 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="{% static 'css/homepage.css' %}" rel="stylesheet">
+    <link href="{% static 'css/loader.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="website-icon">
+            <img src="{% static 'img/data-visualization.png' %}" width="50px">
+            VisualMetrics
+          </div>
+        <div class="auth">
+            {% if user.is_authenticated %}
+          <a href="{% url 'logout' %}"><div class="login">Logout</div></a>
+            {% else %}
+          <a href="{% url 'signin' %}"><div class="login">Signin</div></a>
+          <a href="{% url 'signup' %}"><div class="signup">Signup</div></a>
+          {% endif %}
+        </div>
+    </header>
+    <div class="website-contents"></div>
+    <section>
+        <div class="section-card">
+            {% for item in items %}
+            <form class="card" method="post">
+                {% csrf_token %}
+                <!-- <input type="hidden" name="title" value="{{ item.title }}"> -->
+                <button type="submit" class="button card">
+                    <img src="{% static item.icon %}" width="60px">
+                    <div class="card-header">{{ item.title }}</div>
+                    <div class="card-body">
+                        {{ item.contents }}
+                    </div>
+                </button>
+            </form>
+            {% endfor %}
+        </div>
+    </section>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+</body>
+
+</html>

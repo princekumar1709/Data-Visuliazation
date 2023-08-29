@@ -1,0 +1,73 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/loader.css' %}" rel="stylesheet" />
+  </head>
+
+  <body>
+    <section>
+      <div class="floating-diagram1 diagram">
+        <div class="chat-graph">
+          <div class="message" style="height: 50px"></div>
+          <div class="message" style="height: 70px"></div>
+          <div class="message" style="height: 90px"></div>
+          <div class="message" style="height: 120px"></div>
+        </div>
+      </div>
+
+      <div class="floating-diagram2 diagram">
+        <div class="chart2">
+          <div class="chart-part" data-value="120"></div>
+          <div class="chart-part" data-value="90"></div>
+          <div class="chart-part" data-value="150"></div>
+          <!-- Add more chart cells as needed -->
+        </div>
+      </div>
+
+      <div class="form-box">
+        <div class="form-value">
+          <form action="signup" method="post">
+            {% csrf_token %}
+
+            <h2>Sign Up</h2>
+
+            <div class="inputbox">
+              <ion-icon name="mail-outline"></ion-icon>
+              <input type="email" name="username" required />
+              <label>Email</label>
+            </div>
+
+            <div class="inputbox">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <input type="password" name="password" required />
+              <label>Password</label>
+            </div>
+
+            <div class="forget hidden">
+              <label><input type="checkbox" />Remember Me</label>
+              <a href="#">Forgot Password</a>
+            </div>
+
+            <button>Register</button>
+            <div class="register">
+              <p>
+                Already have an account.<a href="{% url 'signin' %}">Login</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+  </body>
+</html>

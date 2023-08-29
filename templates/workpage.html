@@ -1,0 +1,50 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph</title>
+    <link href="{% static 'css/workpage.css' %}" rel="stylesheet">
+    <link href="{% static 'css/loader.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+     <div class="tableau-container">
+      <div class="draggable-container sidebar">
+        {% for row in data %}
+        <p class="shallow-draggable"  draggable="true">{{row}}</p>
+        {% endfor %}
+      </div>
+    
+      <div class="main-content">
+          <div class="title-w-chips">
+            <span class="title">Columns</span>
+            <div class="chips-container input" id="columns">
+              <!-- Chips will be added here -->
+            </div>
+        </div>
+          <div class="title-w-chips">
+            <span class="title">Rows</span>
+            <div class="chips-container input" id="rows">
+              <!-- Chips will be added here -->
+          </div>
+          <div style="max-width: 600px; margin: 0 auto;">
+            <canvas id="chart"></canvas>
+        </div>
+          
+        </div>
+      </div>
+    </div>
+    
+   
+</body>
+
+</html>
+
