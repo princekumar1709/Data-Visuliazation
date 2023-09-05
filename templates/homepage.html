@@ -32,7 +32,7 @@
             {% for item in items %}
             <form class="card" method="post">
                 {% csrf_token %}
-                <!-- <input type="hidden" name="title" value="{{ item.title }}"> -->
+                <input type="hidden" name="title" value="{{ item.title }}">
                 <button type="submit" class="button card">
                     <img src="{% static item.icon %}" width="60px">
                     <div class="card-header">{{ item.title }}</div>

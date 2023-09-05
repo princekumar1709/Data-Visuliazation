@@ -8,43 +8,233 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graph</title>
     <link href="{% static 'css/workpage.css' %}" rel="stylesheet">
-    <link href="{% static 'css/loader.css' %}" rel="stylesheet">
+    <!-- <link href="{% static 'css/loader.css' %}" rel="stylesheet"> -->
 
 </head>
 
 <body>
 
+    <div class="tableau-container">
+        <div class="draggable-container sidebar">
+            {% for row in data %}
+            <p class="shallow-draggable" draggable="true">{{row}}</p>
+            {% endfor %}
+        </div>
 
+        <div class="main-content">
+            <div class="title-w-chips">
+                <span class="title">Columns</span>
+                <div class="chips-container input" id="columns">
+                    <!-- Chips will be added here -->
+                </div>
+            </div>
+            <div class="title-w-chips">
+                <span class="title">Rows</span>
+                <div class="chips-container input" id="rows">
+                    <!-- Chips will be added here -->
+                </div>
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <canvas id="chart"></canvas>
+                </div>
 
-     <div class="tableau-container">
-      <div class="draggable-container sidebar">
-        {% for row in data %}
-        <p class="shallow-draggable"  draggable="true">{{row}}</p>
-        {% endfor %}
-      </div>
-    
-      <div class="main-content">
-          <div class="title-w-chips">
-            <span class="title">Columns</span>
-            <div class="chips-container input" id="columns">
-              <!-- Chips will be added here -->
             </div>
         </div>
-          <div class="title-w-chips">
-            <span class="title">Rows</span>
-            <div class="chips-container input" id="rows">
-              <!-- Chips will be added here -->
-          </div>
-          <div style="max-width: 600px; margin: 0 auto;">
-            <canvas id="chart"></canvas>
-        </div>
-          
-        </div>
-      </div>
     </div>
-    
-   
+
+    <!-- <script src="{% static 'js/script.js' %}"></script> -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const draggables = document.querySelectorAll(".shallow-draggable");
+            const containers = document.querySelectorAll(".chips-container.input");
+            const data = JSON.parse('{{ data_json | safe }}');
+            var labels, graphData;
+
+            let chartInstance = null;
+            let ctx = document.getElementById("chart").getContext("2d");
+
+            let graphDetails = [];
+
+            let isDragging = false;
+            let draggingElement;
+            let activeContainer = null;
+
+            draggables.forEach((draggable) => {
+                draggable.addEventListener("dragstart", (e) => {
+                    e.dataTransfer.setData("text/plain", draggable.innerText); // Set the data to be dragged
+                    draggable.classList.add("dragging");
+                    isDragging = true;
+                    draggingElement = draggable;
+                });
+
+                draggable.addEventListener("dragend", () => {
+                    draggable.classList.remove("dragging");
+                    isDragging = false;
+                });
+            });
+
+            containers.forEach((container) => {
+                container.addEventListener("dragover", function (e) {
+                    e.preventDefault();
+                    if (activeContainer !== container) {
+                        activeContainer = container;
+                        container.addEventListener("drop", handleDropEvent);
+                    }
+                });
+            });
+
+            function handleDropEvent(e) {
+                e.preventDefault();
+                const container = e.currentTarget;
+                const afterElement = getDragAfterElement(container, e.clientY);
+                const dragging = document.querySelector(".dragging");
+
+                if (isDragging && dragging === draggingElement) {
+                    const chipValue = e.dataTransfer.getData("text/plain"); // Get the dragged data
+                    const chip = createChipElement(chipValue);
+                    if (afterElement == null) {
+                        container.appendChild(chip);
+                    } else {
+                        container.insertBefore(chip, afterElement);
+                    }
+
+                    // Update graphDetails and make the POST request
+                    graphDetails.push({ id: container.id, value: chipValue });
+                    updateGraphDetailsOnPage(graphDetails);
+                    saveGraphDetails(graphDetails);
+                }
+
+                activeContainer = null;
+                container.removeEventListener("drop", handleDropEvent);
+            }
+
+            function handleRemoveChip(e) {
+                const removeButton = e.currentTarget;
+                const chip = removeButton.closest(".chip");
+                const chipValue = chip.querySelector(".chip-text").textContent;
+
+                // Find and remove the corresponding chip from the graphDetails array
+                graphDetails = graphDetails.filter((detail) => detail.value !== chipValue);
+                chip.remove();
+
+                // Update graphDetails and make the POST request
+                updateGraphDetailsOnPage(graphDetails);
+                saveGraphDetails(graphDetails);
+            }
+
+            function updateGraphDetailsOnPage(graphDetails) {
+
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+                // Find values for labels and graphData
+                graphDetails.forEach((detail) => {
+                    if (detail.id === 'columns') {
+                        labels = data[`${detail.value}`];
+                        console.log({ columns: labels })
+
+                    } else if (detail.id === 'rows') {
+                        graphData = data[`${detail.value}`];
+                        console.log({ rows: graphData })
+                    }
+                });
+
+                // Clear existing graphDetails elements from the DOM
+                // const graphDetailsContainer = document.getElementById("graphDetailsContainer");
+                // graphDetailsContainer.innerHTML = "";
+
+                // Add updated graphDetails elements to the DOM
+                // graphDetails.forEach((details) => {
+                // const detailsElement = document.createElement("div");
+                // detailsElement.textContent = JSON.stringify(details);
+                //  graphDetailsContainer.appendChild(detailsElement);
+                // });
+
+                // Add event listeners to the remove buttons
+                const removeButtons = document.querySelectorAll(".remove-chip");
+                removeButtons.forEach((button) => {
+                    button.removeEventListener("click", handleRemoveChip); // Clean up previous event listeners
+                    button.addEventListener("click", handleRemoveChip);
+                });
+
+                // Update chart
+
+            }
+
+            function saveGraphDetails(graphDetails) {
+                // Make the POST request to save graphDetails
+                fetch("/workpage", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken(),
+                    },
+                    body: JSON.stringify({ data: graphDetails }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        // Handle the response data
+                        if (data.status === "success") {
+                            // Update the UI with the new graphDetails
+                            graphDetails = data.graphDetails;
+                            updateGraphDetailsOnPage(graphDetails);
+                        }
+                    })
+                    .catch((error) => {
+                        // Handle errors
+                    });
+            }
+
+            function getCSRFToken() {
+                const csrfCookie = document.cookie
+                    .split(";")
+                    .find((cookie) => cookie.trim().startsWith("csrftoken="));
+                if (csrfCookie) {
+                    return csrfCookie.split("=")[1];
+                }
+                return "";
+            }
+
+            function createChipElement(text) {
+                const chip = document.createElement("div");
+                chip.classList.add("chip");
+
+                const chipText = document.createElement("span");
+                chipText.classList.add("chip-text");
+                chipText.textContent = text;
+
+                const removeChip = document.createElement("span");
+                removeChip.classList.add("remove-chip");
+                removeChip.textContent = "×";
+                removeChip.addEventListener("click", handleRemoveChip);
+
+                chip.appendChild(chipText);
+                chip.appendChild(removeChip);
+
+                return chip;
+            }
+
+            function getDragAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll(".chip")];
+
+                return draggableElements.reduce(
+                    (closest, child) => {
+                        const box = child.getBoundingClientRect();
+                        const offset = y - box.top - box.height / 2;
+                        if (offset < 0 && offset > closest.offset) {
+                            return { offset: offset, element: child };
+                        } else {
+                            return closest;
+                        }
+                    },
+                    { offset: Number.NEGATIVE_INFINITY }
+                ).element;
+            }
+
+            // Call the initial updateGraphDetailsOnPage function to set up the chart
+            updateGraphDetailsOnPage(graphDetails);
+        });
+    </script>
+
 </body>
 
 </html>
-

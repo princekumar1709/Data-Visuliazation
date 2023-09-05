@@ -18,7 +18,7 @@ def signup(request):
         )
         user.save()
         print("User created")
-        return redirect("/sign-in")
+        return redirect("authentication/signup")
 
     return render(request, "sign-up.html")
 

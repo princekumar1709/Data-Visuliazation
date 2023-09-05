@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# login url
+LOGIN_URL = '/authentication/signup'
+LOGIN_REDIRECT_URL = '/'
+
+
 
 # Application definition
 
@@ -79,7 +84,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'USER':'root',
-        'PASSWORD':'789456',
+        'PASSWORD':'987654',
         'NAME': 'DataVisual',
         'HOST':'localhost',
         'PORT':'3306',
