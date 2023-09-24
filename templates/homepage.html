@@ -19,6 +19,7 @@
           </div>
         <div class="auth">
             {% if user.is_authenticated %}
+            <span>Welocome {{user.username}}</span>
           <a href="{% url 'logout' %}"><div class="login">Logout</div></a>
             {% else %}
           <a href="{% url 'signin' %}"><div class="login">Signin</div></a>

@@ -61,7 +61,7 @@ def homepage(request):
 
     return render(request, "homepage.html", {"items": items})
 
-
+  
 @login_required
 def uploadfile(request):
     
@@ -77,7 +77,7 @@ def uploadfile(request):
             # For demonstration purposes, let's assume you just want to save the file to the 'media' folder.
 
             # Get the file's name
-            df = pd.read_excel(uploaded_file, engine="openpyxl")
+            df = pd.read_excel(uploaded_file, engine="xlrd ,openpyxl")
             data = df.to_dict(orient="records")
             all_keys = set().union(*data)
             print(all_keys)
@@ -93,7 +93,7 @@ def uploadfile(request):
 
             # Here, you can process the uploaded file and return an appropriate response.
             # For example, you can return a success message to display on the web page.
-        return redirect("/workpage")
+        return redirect("workpage")
     return render(request, "uploadfile.html", {"index_form": index_form})
 
 @login_required
@@ -113,7 +113,7 @@ def workpage(request):
             data = json.loads(body_unicode)
             graphDetails = data.get("data")
             
-            print(graphDetails)
+            print('graphdetail :',graphDetails)
             return JsonResponse(
                 {"status": "success", "data": data,'data_json' : data_json, "graphDetails": graphDetails}
             )

@@ -18,12 +18,9 @@ def signup(request):
         )
         user.save()
         print("User created")
-        return redirect("authentication/signup")
+        return redirect("signin")
 
-    return render(request, "sign-up.html")
-
-
-
+    return render(request, "signup.html")
 
 def signin(request):
     if request.method == "POST":
@@ -34,15 +31,15 @@ def signin(request):
         if user is not None:
             auth.login(request, user)
             print("Login Succesfull")
-            return redirect("/")
+            return redirect("homepage")
         else:
             messages.info(request, "Invalid credentials")
-            return redirect("/sign-in")
+            return redirect("signin")
 
-    return render(request, "sign-in.html")
+    return render(request, "signin.html")
 
 def logout(request):
     auth.logout(request)
-    return redirect("/sign-in")
+    return redirect("homepage")
 
 
