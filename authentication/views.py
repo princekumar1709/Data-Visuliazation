@@ -37,12 +37,12 @@ def signin(request):
             return redirect("/")
         else:
             messages.info(request, "Invalid credentials")
-            return redirect("/sign-in")
+            return redirect("sign-in")
 
     return render(request, "sign-in.html")
 
 def logout(request):
     auth.logout(request)
-    return redirect("/sign-in")
+    return redirect("sign-in")
 
 

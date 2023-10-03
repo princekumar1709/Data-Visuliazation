@@ -122,7 +122,6 @@ def workpage(request):
                 {"status": "error", "message": "Invalid JSON format in the request."},
                 status=400,
             )
-
     return render(request, "workpage.html", {"data": data,'data_json' : data_json, "graphDetails": graphDetails})
 
 
