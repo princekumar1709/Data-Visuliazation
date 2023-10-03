@@ -77,7 +77,7 @@ def uploadfile(request):
             # For demonstration purposes, let's assume you just want to save the file to the 'media' folder.
 
             # Get the file's name
-            df = pd.read_excel(uploaded_file, engine="xlrd ,openpyxl")
+            df = pd.read_excel(uploaded_file, engine="xlrd")
             data = df.to_dict(orient="records")
             all_keys = set().union(*data)
             print(all_keys)
