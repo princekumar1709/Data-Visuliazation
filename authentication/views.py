@@ -1,6 +1,4 @@
 from django.shortcuts import render,redirect
-import os
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
 from django.utils import timezone
@@ -8,19 +6,22 @@ from django.utils import timezone
 # Create your views here.
 
 def signup(request):
-    if request.method == "POST":
-        name = request.POST.get("name")
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        date_joined = timezone.now()
-        user = User.objects.create_user(
-            username=username, password=password, date_joined=date_joined
-        )
-        user.save()
-        print("User created")
-        return redirect("signin")
-
-    return render(request, "signup.html")
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        #check usernames and password already exist or not
+        if User.objects.filter(username=username).exists():
+             messages.info(request,'username already exists')
+             return redirect('signup')
+        else:
+            user= User.objects.create_user(username=username,password=password)
+            user.save()
+            # print('User created successfully')
+            return redirect('signin')  # Redirect to the login page
+        
+    #if request.method is 'GET'    
+    else:
+         return render(request,'signup.html')
 
 def signin(request):
     if request.method == "POST":
@@ -33,7 +34,7 @@ def signin(request):
             print("Login Succesfull")
             return redirect("homepage")
         else:
-            messages.info(request, "Invalid credentials")
+            messages.info(request,'Invalid username.')
             return redirect("signin")
 
     return render(request, "signin.html")

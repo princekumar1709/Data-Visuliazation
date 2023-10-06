@@ -8,6 +8,16 @@
     <title>Login</title>
     <link href="{% static 'css/style.css' %}" rel="stylesheet" />
     <link href="{% static 'css/loader.css' %}" rel="stylesheet" />
+    <style>
+      .msg{
+          text-align: center;
+      }
+      .msg h5{
+          color: red;
+          font-weight: 600;
+          font-size: 17px;
+      }
+  </style>
   </head>
 
   <body>
@@ -42,6 +52,11 @@
               <input type="email" name="username" required />
               <label>Email</label>
             </div>
+            <div class="msg">
+              {% for message in messages %}
+                  <h5>{{message}}</h5>
+              {% endfor %}
+          </div>
 
             <div class="inputbox">
               <ion-icon name="lock-closed-outline"></ion-icon>

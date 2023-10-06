@@ -13,50 +13,50 @@ def homepage(request):
         {
             "icon": "img/pie-chart.png",
             "title": "Pie Chart",
-            "contents": "Reduce file size while optimizing for maximal PDF quality",
+            "contents": "Useful for showing the composition of a dataset.",
         },
         {
             "icon": "img/bar-chart.png",
             "title": "Bar Chart",
-            "contents": "Reduce file size while optimizing for maximal PDF quality",
-        },
-        {
-            "icon": "img/donut.png",
-            "title": "Donut Chart",
-            "contents": "Reduce file size while optimizing for maximal PDF quality",
+            "contents": "Useful for comparing different categories or groups.",
         },
         {
             "icon": "img/histogram.png",
             "title": "Histogram Chart",
-            "contents": "Reduce file size while optimizing for maximal PDF quality",
+            "contents": "Useful to visualize data patterns and trends.",
         },
         {
             "icon": "img/scatterPlot.png",
             "title": "ScatterPlot Chart",
-            "contents": "Reduce file size while optimizing for maximal PDF quality",
+            "contents": "Useful for showing the relationship or correlation between two variables.",
+        },
+        {
+            "icon": "img/donut.png",
+            "title": "Donut Chart",
+            "contents": "Useful for displaying the composition of a dataset.",
         },
         {
             "icon": "img/gantt-chart.png",
             "title": "Gantt Chart",
-            "contents": "Reduce file size while optimizing for maximal PDF quality",
+            "contents": "Useful in project management to schedule and visualize the timeline of tasks and activities.",
         },
         {
             "icon": "img/area-graph.png",
             "title": "Area Chart",
-            "contents": "Reduce file size while optimizing for maximal PDF quality",
+            "contents": "Useful for visualizing data such as sales, revenue, or population growth.",
         },
         {
             "icon": "img/pyramid-chart.png",
             "title": "Pyramid Chart",
-            "contents": "Reduce file size while optimizing for maximal PDF quality",
+            "contents": "Useful for visualizing population demographics or employee organizational structures.",
         },
     ]
 
     if request.method == "POST":
-        title = request.POST.get("title")
-        index_form = {"title": title}
-        print("index_form:", index_form)
-        request.session["index_form"] = index_form
+        # title = request.POST.get("title")
+        # index_form = {"title": title}
+        # print("index_form:", index_form)
+        # request.session["index_form"] = index_form
         return redirect("uploadfile")
 
     return render(request, "homepage.html", {"items": items})
@@ -72,15 +72,12 @@ def uploadfile(request):
         if "xls_file" in request.FILES:
             # Get the uploaded file from the request.FILES dictionary
             uploaded_file = request.FILES["xls_file"]
-
-            # Process the uploaded file as needed (e.g., read the data, compress, etc.)
-            # For demonstration purposes, let's assume you just want to save the file to the 'media' folder.
-
             # Get the file's name
             df = pd.read_excel(uploaded_file, engine="xlrd")
             data = df.to_dict(orient="records")
             all_keys = set().union(*data)
             print(all_keys)
+            
             sortedData = {key: [] for key in all_keys}
             for item in data:
                 for key in all_keys:
@@ -91,8 +88,6 @@ def uploadfile(request):
             ExcelSheetInfo = ExcelSheetData.objects.create(data=sortedData)
             ExcelSheetInfo.save()
 
-            # Here, you can process the uploaded file and return an appropriate response.
-            # For example, you can return a success message to display on the web page.
         return redirect("workpage")
     return render(request, "uploadfile.html", {"index_form": index_form})
 
@@ -100,8 +95,10 @@ def uploadfile(request):
 def workpage(request):
     try:
         all_objects = ExcelSheetData.objects.latest('created_at')
+        print(all_objects)
         data = all_objects.data
         data_json = json.dumps(data)
+        print(data_json)
     except ExcelSheetData.DoesNotExist:
         data = []
     
@@ -111,8 +108,8 @@ def workpage(request):
         try:
             body_unicode = request.body.decode("utf-8")
             data = json.loads(body_unicode)
+            #print(data)
             graphDetails = data.get("data")
-            
             print('graphdetail :',graphDetails)
             return JsonResponse(
                 {"status": "success", "data": data,'data_json' : data_json, "graphDetails": graphDetails}

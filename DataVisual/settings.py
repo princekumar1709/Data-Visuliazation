@@ -84,7 +84,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'USER':'root',
-        'PASSWORD':'987654',
+        'PASSWORD':'789456',
         'NAME': 'DataVisual',
         'HOST':'localhost',
         'PORT':'3306',

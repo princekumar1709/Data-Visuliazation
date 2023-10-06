@@ -106,6 +106,7 @@
     padding: 20px;
     cursor: pointer;
     border: 2px solid #ffffff;
+    align-items: center;
   }
   
   .card:hover {
@@ -123,7 +124,7 @@
   
   .card-body {
     letter-spacing: .5px;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 18px;
     color: #626870;
   }

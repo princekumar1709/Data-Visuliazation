@@ -246,3 +246,10 @@ button {
 .hidden {
   visibility: hidden;
 }
+
+.msg{
+  text-align: center;
+}
+.msg h5{
+  color: red;
+}

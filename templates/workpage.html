@@ -137,19 +137,6 @@
                         console.log({ rows: graphData })
                     }
                 });
-
-                // Clear existing graphDetails elements from the DOM
-                // const graphDetailsContainer = document.getElementById("graphDetailsContainer");
-                // graphDetailsContainer.innerHTML = "";
-
-                // Add updated graphDetails elements to the DOM
-                // graphDetails.forEach((details) => {
-                // const detailsElement = document.createElement("div");
-                // detailsElement.textContent = JSON.stringify(details);
-                //  graphDetailsContainer.appendChild(detailsElement);
-                // });
-
-                // Add event listeners to the remove buttons
                 const removeButtons = document.querySelectorAll(".remove-chip");
                 removeButtons.forEach((button) => {
                     button.removeEventListener("click", handleRemoveChip); // Clean up previous event listeners
