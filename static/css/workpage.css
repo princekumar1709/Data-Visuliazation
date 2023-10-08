@@ -142,4 +142,12 @@ body {
     flex-grow: 1;
     width: 100%;
   }
+
+  table {
+    border: 1px solid lightgray;
+    border-collapse: collapse
+  }
   
+  td,tr,th{
+    padding: 10px;
+  }

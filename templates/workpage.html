@@ -38,6 +38,7 @@
                 </div>
 
             </div>
+        <div id="table-container"></div>
         </div>
     </div>
 
@@ -46,6 +47,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             const draggables = document.querySelectorAll(".shallow-draggable");
             const containers = document.querySelectorAll(".chips-container.input");
+            const tableContainer = document.getElementById("table-container");
             const data = JSON.parse('{{ data_json | safe }}');
             var labels, graphData;
 
@@ -163,7 +165,10 @@
                         if (data.status === "success") {
                             // Update the UI with the new graphDetails
                             graphDetails = data.graphDetails;
+                            tableContainer.innerHTML = data.table_html;
+                            console.log(data.table_html)
                             updateGraphDetailsOnPage(graphDetails);
+
                         }
                     })
                     .catch((error) => {
@@ -219,7 +224,9 @@
 
             // Call the initial updateGraphDetailsOnPage function to set up the chart
             updateGraphDetailsOnPage(graphDetails);
+            creatTable(table_html)
         });
+
     </script>
 
 </body>
