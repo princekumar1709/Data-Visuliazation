@@ -117,6 +117,7 @@
                 // Find and remove the corresponding chip from the graphDetails array
                 graphDetails = graphDetails.filter((detail) => detail.value !== chipValue);
                 chip.remove();
+                tableContainer.innerHTML = "";
 
                 // Update graphDetails and make the POST request
                 updateGraphDetailsOnPage(graphDetails);
@@ -166,7 +167,6 @@
                             // Update the UI with the new graphDetails
                             graphDetails = data.graphDetails;
                             tableContainer.innerHTML = data.table_html;
-                            console.log(data.table_html)
                             updateGraphDetailsOnPage(graphDetails);
 
                         }
@@ -224,7 +224,6 @@
 
             // Call the initial updateGraphDetailsOnPage function to set up the chart
             updateGraphDetailsOnPage(graphDetails);
-            creatTable(table_html)
         });
 
     </script>
