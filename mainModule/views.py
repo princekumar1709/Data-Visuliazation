@@ -6,8 +6,6 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
 import plotly.express as px
-import plotly
-
 
 # Create your views here.
 # @login_required
@@ -72,7 +70,7 @@ def uploadfile(request):
 
     if request.method == "POST":
         # Check if the form contains the file input with the name "xls_file"
-        if "xls_file" in request.FILES:
+        if "xls_file" or "xlsx_file" in request.FILES:
             # Get the uploaded file from the request.FILES dictionary
             uploaded_file = request.FILES["xls_file"]
             # Get the file's name
@@ -137,6 +135,9 @@ def workpage(request):
             })
 
             fig = px.bar(df, x="nation", y="count", title="Long-Form Input")
+            
+            # # Generate an HTML representation of the Plotly figure
+            # chart_html = pyo.plot(fig, output_type="div", include_plotlyjs=False)
             fig.show()
             # Convert the Plotly figure to HTML
             chart_html = fig.to_html(full_html=False)
