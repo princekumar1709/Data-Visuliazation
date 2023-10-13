@@ -119,6 +119,7 @@ def workpage(request):
 
             column = getFilteredValue(graphDetails, desired_column)
             row = getFilteredValue(graphDetails, desired_row)
+ 
 
             if column is None or row is None:
                 # Either column or row is not present; show a table instead
@@ -130,11 +131,10 @@ def workpage(request):
 
             # Create a DataFrame using the selected columns and data from data_json
             df = pd.DataFrame({
-                "nation": json.loads(data_json)[column],
-                "count": json.loads(data_json)[row],  # Example data, replace with your own
+                column: json.loads(data_json)[column],
+                row: json.loads(data_json)[row],  # Example data, replace with your own
             })
-
-            fig = px.bar(df, x="nation", y="count", title="Long-Form Input")
+            fig = px.bar(df, x=column, y=row, title="%s VS %s" % (column,row))
             
             # # Generate an HTML representation of the Plotly figure
             # chart_html = pyo.plot(fig, output_type="div", include_plotlyjs=False)
