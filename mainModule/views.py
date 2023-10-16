@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
 import plotly.express as px
+import plotly.offline
 
 # Create your views here.
 # @login_required
@@ -134,11 +135,12 @@ def workpage(request):
                 column: json.loads(data_json)[column],
                 row: json.loads(data_json)[row],  # Example data, replace with your own
             })
-            fig = px.bar(df, x=column, y=row, title="%s VS %s" % (column,row))
+            # fig = px.bar(df, x=column, y=row, title="%s VS %s" % (column,row))
+            fig = px.pie(df, names=column, values=row, title="%s VS %s" % (column,row))
             
-            # # Generate an HTML representation of the Plotly figure
-            # chart_html = pyo.plot(fig, output_type="div", include_plotlyjs=False)
+            # Generate an HTML representation of the Plotly figure
             fig.show()
+
             # Convert the Plotly figure to HTML
             chart_html = fig.to_html(full_html=False)
 
