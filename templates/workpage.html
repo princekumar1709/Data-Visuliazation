@@ -35,6 +35,11 @@
           </div> -->
         </div>
         <div id="table-container"></div>
+        {% if plotly_graph_exists %}
+        <iframe src="{% static 'D:/work/Data-Visuliazation/static/plotly_graph.html' %}" width="100%" height="450px"></iframe>
+        {% else %}
+        <p>No Plotly graph available.</p>
+        {% endif %}
     </div>
     </div>
     <!-- <script src="{% static 'js/script.js' %}"></script> -->

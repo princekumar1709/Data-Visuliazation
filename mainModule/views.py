@@ -6,7 +6,6 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
 import plotly.express as px
-import plotly.offline
 
 # Create your views here.
 # @login_required
@@ -94,6 +93,7 @@ def uploadfile(request):
     return render(request, "uploadfile.html", {"index_form": index_form})
 
 
+
 @login_required
 def workpage(request):
     try:
@@ -129,7 +129,6 @@ def workpage(request):
                 return JsonResponse(
                     {"status": "success", "data": data, "graphDetails": graphDetails, "table_html": table_html}
                 )
-
             # Create a DataFrame using the selected columns and data from data_json
             df = pd.DataFrame({
                 column: json.loads(data_json)[column],
@@ -137,23 +136,27 @@ def workpage(request):
             })
             # fig = px.bar(df, x=column, y=row, title="%s VS %s" % (column,row))
             fig = px.pie(df, names=column, values=row, title="%s VS %s" % (column,row))
-            
-            # Generate an HTML representation of the Plotly figure
-            fig.show()
 
-            # Convert the Plotly figure to HTML
-            chart_html = fig.to_html(full_html=False)
+            fig.write_html("D:/work/Data-Visuliazation/static/plotly_graph.html")
+            graph_exists = plotly_graph_exists()
+
+            # Generate an HTML representation of the Plotly figure
+            # fig.show()
 
             return JsonResponse(
                 {"status": "success", "data": data, 'data_json': data_json,
-                    "graphDetails": graphDetails, "chart_html": chart_html}
+                    "graphDetails": graphDetails,'plotly_graph_exists':graph_exists}
             )
         except json.JSONDecodeError:
             return JsonResponse(
                 {"status": "error", "message": "Invalid JSON format in the request."},
                 status=400,
             )
-    return render(request, "workpage.html", {"data": data, 'data_json': data_json, "graphDetails": graphDetails})
+    return render(request, "workpage.html", {"data": data, 'data_json': data_json, "graphDetails": graphDetails,'plotly_graph_exists':plotly_graph_exists})
+
+import os
+def plotly_graph_exists():
+    return os.path.exists("D:/work/Data-Visuliazation/static/plotly_graph.html")
 
 
 def getFilteredValue(graphDetails, desired_key):
