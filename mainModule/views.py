@@ -6,8 +6,6 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
 import plotly.express as px
-import plotly
-
 
 # Create your views here.
 # @login_required
@@ -72,7 +70,7 @@ def uploadfile(request):
 
     if request.method == "POST":
         # Check if the form contains the file input with the name "xls_file"
-        if "xls_file" in request.FILES:
+        if "xls_file" or "xlsx_file" in request.FILES:
             # Get the uploaded file from the request.FILES dictionary
             uploaded_file = request.FILES["xls_file"]
             # Get the file's name
@@ -93,6 +91,7 @@ def uploadfile(request):
 
         return redirect("workpage")
     return render(request, "uploadfile.html", {"index_form": index_form})
+
 
 
 @login_required
@@ -121,6 +120,7 @@ def workpage(request):
 
             column = getFilteredValue(graphDetails, desired_column)
             row = getFilteredValue(graphDetails, desired_row)
+ 
 
             if column is None or row is None:
                 # Either column or row is not present; show a table instead
@@ -129,28 +129,34 @@ def workpage(request):
                 return JsonResponse(
                     {"status": "success", "data": data, "graphDetails": graphDetails, "table_html": table_html}
                 )
-
             # Create a DataFrame using the selected columns and data from data_json
             df = pd.DataFrame({
-                "nation": json.loads(data_json)[column],
-                "count": json.loads(data_json)[row],  # Example data, replace with your own
+                column: json.loads(data_json)[column],
+                row: json.loads(data_json)[row],  # Example data, replace with your own
             })
+            # fig = px.bar(df, x=column, y=row, title="%s VS %s" % (column,row))
+            fig = px.pie(df, names=column, values=row, title="%s VS %s" % (column,row))
 
-            fig = px.bar(df, x="nation", y="count", title="Long-Form Input")
-            fig.show()
-            # Convert the Plotly figure to HTML
-            chart_html = fig.to_html(full_html=False)
+            fig.write_html("static/plotly_graph.html")
+            # graph_exists = plotly_graph_exists()
+
+            # Generate an HTML representation of the Plotly figure
+            # fig.show()
 
             return JsonResponse(
                 {"status": "success", "data": data, 'data_json': data_json,
-                    "graphDetails": graphDetails, "chart_html": chart_html}
+                    "graphDetails": graphDetails,'plotly_graph_exists':plotly_graph_exists()}
             )
         except json.JSONDecodeError:
             return JsonResponse(
                 {"status": "error", "message": "Invalid JSON format in the request."},
                 status=400,
             )
-    return render(request, "workpage.html", {"data": data, 'data_json': data_json, "graphDetails": graphDetails})
+    return render(request, "workpage.html", {"data": data, 'data_json': data_json, "graphDetails": graphDetails,'plotly_graph_exists':plotly_graph_exists})
+
+import os
+def plotly_graph_exists():
+    return os.path.exists("static/plotly_graph.html")
 
 
 def getFilteredValue(graphDetails, desired_key):

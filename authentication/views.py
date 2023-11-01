@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
 from django.utils import timezone
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -42,5 +43,12 @@ def signin(request):
 def logout(request):
     auth.logout(request)
     return redirect("homepage")
+
+
+def plotly_graph(request):
+    # Return the Plotly-generated HTML file
+    with open("static/plotly_graph.html", "r") as file:
+        html_content = file.read()
+    return HttpResponse(html_content)
 
 
