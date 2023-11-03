@@ -174,10 +174,7 @@
                           if(!data.table_html){
                             tableContainer.innerHTML = ""
                           }
-                          
-                          if(data.table_html){
-                            iframeContainer.innerHTML = `<iframe src="{% static 'plotly_graph.html' %}" width="100%" height="600"></iframe>`
-                          }
+  
                           if(data.plotly_graph_exists){
                             iframeContainer.innerHTML = `<iframe src="{% static 'plotly_graph.html' %}" width="100%" height="600"></iframe>`
                           }
