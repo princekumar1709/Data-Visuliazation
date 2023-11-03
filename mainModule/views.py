@@ -124,8 +124,10 @@ def workpage(request):
 
             if column is None or row is None:
                 # Either column or row is not present; show a table instead
-                table_html = createTable(json.loads(data_json)[column] or json.loads(data_json)[row],column or row)
-                
+                if(column):
+                 table_html = createTable(json.loads(data_json)[column],column)
+                else:
+                 table_html = createTable(json.loads(data_json)[row],row)
                 return JsonResponse(
                     {"status": "success", "data": data, "graphDetails": graphDetails, "table_html": table_html}
                 )
@@ -134,8 +136,8 @@ def workpage(request):
                 column: json.loads(data_json)[column],
                 row: json.loads(data_json)[row],  # Example data, replace with your own
             })
-            # fig = px.bar(df, x=column, y=row, title="%s VS %s" % (column,row))
-            fig = px.pie(df, names=column, values=row, title="%s VS %s" % (column,row))
+            fig = px.bar(df, x=column, y=row, title="%s VS %s" % (column,row))
+            # fig = px.pie(df, names=column, values=row, title="%s VS %s" % (column,row))
 
             fig.write_html("static/plotly_graph.html")
             # graph_exists = plotly_graph_exists()

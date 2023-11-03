@@ -35,8 +35,9 @@
           </div> -->
         </div>
         <div id="table-container"></div>
+     
         {% if plotly_graph_exists %}
-        <iframe src="{% static 'plotly_graph.html' %}" width="100%" height="600"></iframe>
+        <div id="iframe-container"></div>
         {% else %}
         <p>No Plotly graph available.</p>
         {% endif %}
@@ -49,6 +50,7 @@
           const draggables = document.querySelectorAll(".shallow-draggable");
           const containers = document.querySelectorAll(".chips-container.input");
           const tableContainer = document.getElementById("table-container");
+          const iframeContainer = document.getElementById("iframe-container");
           const data = JSON.parse('{{ data_json | safe }}');
           var labels, graphData;
 
@@ -119,6 +121,7 @@
               graphDetails = graphDetails.filter((detail) => detail.value !== chipValue);
               chip.remove();
               tableContainer.innerHTML = "";
+              iframeContainer.innerHTML = ""
 
               // Update graphDetails and make the POST request
               updateGraphDetailsOnPage(graphDetails);
@@ -168,6 +171,16 @@
                           // Update the UI with the new graphDetails
                           graphDetails = data.graphDetails;
                           tableContainer.innerHTML = data.table_html;
+                          if(!data.table_html){
+                            tableContainer.innerHTML = ""
+                          }
+                          
+                          if(data.table_html){
+                            iframeContainer.innerHTML = `<iframe src="{% static 'plotly_graph.html' %}" width="100%" height="600"></iframe>`
+                          }
+                          if(data.plotly_graph_exists){
+                            iframeContainer.innerHTML = `<iframe src="{% static 'plotly_graph.html' %}" width="100%" height="600"></iframe>`
+                          }
                           updateGraphDetailsOnPage(graphDetails);
 
                       }
