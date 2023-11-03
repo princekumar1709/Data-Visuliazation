@@ -136,7 +136,7 @@ def workpage(request):
                 column: json.loads(data_json)[column],
                 row: json.loads(data_json)[row],  # Example data, replace with your own
             })
-            fig = px.bar(df, x=column, y=row, title="%s VS %s" % (column,row))
+            fig = px.bar(df, x=column, y=row, color=column,title="%s VS %s" % (column,row))
             # fig = px.pie(df, names=column, values=row, title="%s VS %s" % (column,row))
 
             fig.write_html("static/plotly_graph.html")
