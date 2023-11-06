@@ -138,9 +138,10 @@ def workpage(request):
             })
             fig = px.bar(df, x=column, y=row, color=column,title="%s VS %s" % (column,row))
             # fig = px.pie(df, names=column, values=row, title="%s VS %s" % (column,row))
+            # fig = px.scatter(df, x=column, y=row, title="%s VS %s" % (column,row))
 
+            # Write a figure into an HTML file representation 
             fig.write_html("static/plotly_graph.html")
-            # graph_exists = plotly_graph_exists()
 
             # Generate an HTML representation of the Plotly figure
             # fig.show()
