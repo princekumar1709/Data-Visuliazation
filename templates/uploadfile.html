@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Visual Metrics</title>
     <link href="{% static 'css/uploadfile.css' %}" rel="stylesheet">
     <link href="{% static 'css/loader.css' %}" rel="stylesheet">
 </head>
@@ -47,10 +47,11 @@
                 <span>Select XLS file</span>
             </label>
         </section>
-        <input id="file" type="file" class="hidden" accept=" .xls" name="xls_file" required>
+        <input id="file" type="file" class="hidden" accept=" .xls ,.xlsx" name="xls_file" required>
         <div class="main">
-            <button class="generate__btn">Generate Graph <img src="{% static 'img/innovation.svg' %}" width="50px"
-                    height="40px"></button>
+            <button class="generate__btn" name="view_data">View Data&nbsp;&nbsp; <img src="{% static 'img/database.png' %}" width="40px" height="40px"></button><br><br>
+            <button class="generate__btn" name="see_report">See Report&nbsp;&nbsp;<img src="{% static 'img/report-48.png' %}" width="40px" height="40px"></button><br><br>
+            <button class="generate__btn" name="generate_graphs">Generate Graph <img src="{% static 'img/innovation.svg' %}" width="50px" height="40px"></button>
         </div>
     </form>
 

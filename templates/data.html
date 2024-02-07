@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Metrics</title>
+    <link rel="stylesheet" href="{% static 'css/data.css' %}">
+</head>
+<body>
+    {% if error %}
+        <p>{{ error }}</p>
+    {% else %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        {% for column in df.columns %}
+                            <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for index, row in df.iterrows %}
+                        <tr>
+                            {% for value in row %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</body>
+</html>

@@ -4,6 +4,7 @@ from .models import ExcelSheetData
 import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from ydata_profiling import ProfileReport
 
 import plotly.express as px
 
@@ -69,29 +70,43 @@ def uploadfile(request):
     index_form = request.session.get("index_form")
 
     if request.method == "POST":
-        # Check if the form contains the file input with the name "xls_file"
-        if "xls_file" or "xlsx_file" in request.FILES:
-            # Get the uploaded file from the request.FILES dictionary
-            uploaded_file = request.FILES["xls_file"]
-            # Get the file's name
-            df = pd.read_excel(uploaded_file, engine="xlrd")
-            data = df.to_dict(orient="records")
-            all_keys = set().union(*data)
-            print(all_keys)
+            # Check if the form contains the file input with the name "xls_file"
+            if "xls_file" in request.FILES or "xlsx_file" in request.FILES:
 
-            sortedData = {key: [] for key in all_keys}
-            for item in data:
-                for key in all_keys:
-                    if key in item:
-                        sortedData[key].append(item[key])
-                    else:
-                        sortedData[key].append(None)
-            ExcelSheetInfo = ExcelSheetData.objects.create(data=sortedData)
-            ExcelSheetInfo.save()
+                # Get the uploaded file from the request.FILES dictionary
+                uploaded_file = request.FILES["xls_file"]
+                # Get the file's name
+                df = pd.read_excel(uploaded_file, engine="xlrd")
 
-        return redirect("workpage")
+                if "view_data" in request.POST:
+                # Render the 'data.html' template with the DataFrame
+                    return render(request, 'data.html', {'df': df})
+            
+                if "see_report" in request.POST:
+                    # Generate the profile report
+                    report = ProfileReport(df, title='Profiling Report')
+                    # Save the report to a file
+                    report.to_file(output_file='static/Report.html')
+                    # Redirect to the report page
+                    return redirect("static/Report.html")
+                
+                if "generate_graphs" in request.POST:
+                    # Convert DataFrame to dictionary
+                    data = df.to_dict(orient="records")
+                    all_keys = set().union(*data)
+                    sortedData = {key: [] for key in all_keys}
+                    for item in data:
+                        for key in all_keys:
+                            sortedData[key].append(item.get(key))
+                    # Create and save ExcelSheetData instance
+                    ExcelSheetInfo = ExcelSheetData.objects.create(data=sortedData)
+                    ExcelSheetInfo.save()
+                    # Redirect to the workpage
+                    return redirect("workpage")
+            
+            return render(request, 'error.html')
+    
     return render(request, "uploadfile.html", {"index_form": index_form})
-
 
 
 @login_required
