@@ -5,7 +5,7 @@ import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from ydata_profiling import ProfileReport
-
+import numpy as np
 import plotly.express as px
 
 # Create your views here.
@@ -91,6 +91,7 @@ def uploadfile(request):
                     return redirect("static/Report.html")
                 
                 if "generate_graphs" in request.POST:
+                    df=df.dropna()
                     # Convert DataFrame to dictionary
                     data = df.to_dict(orient="records")
                     all_keys = set().union(*data)
@@ -113,7 +114,6 @@ def uploadfile(request):
 def workpage(request):
     try:
         all_objects = ExcelSheetData.objects.latest('created_at')
-        print(all_objects)
         data = all_objects.data
         # fetching data from database
         data_json = json.dumps(data)
@@ -127,7 +127,6 @@ def workpage(request):
         try:
             body_unicode = request.body.decode("utf-8")
             data = json.loads(body_unicode)
-            # print(data)
             # draggable data
             graphDetails = data.get("data")
             desired_column = 'columns'
@@ -135,28 +134,42 @@ def workpage(request):
 
             column = getFilteredValue(graphDetails, desired_column)
             row = getFilteredValue(graphDetails, desired_row)
- 
 
             if column is None or row is None:
                 # Either column or row is not present; show a table instead
                 if(column):
-                 table_html = createTable(json.loads(data_json)[column],column)
+                    df=pd.DataFrame({column:json.loads(data_json)[column]})
+                    if type(df[column][0]) in [np.float64,np.float32,np.int32,np.int64]:
+                        fig=px.histogram(data_frame=df,x=column)
+                        fig.write_html("static/plotly_graph.html",default_height=420)
+                    else:
+                        fig=px.bar(data_frame=df,x=column)
+                        fig.write_html("static/plotly_graph.html",default_height=420)
                 else:
-                 table_html = createTable(json.loads(data_json)[row],row)
+                    df=pd.DataFrame({row:json.loads(data_json)[row]})
+                    if type(df[row][0]) in [np.float64,np.float32,np.int32,np.int64]:
+                        fig=px.histogram(data_frame=df,x=row)
+                        fig.write_html("static/plotly_graph.html",default_height=420)
+                    else:
+                        fig=px.bar(data_frame=df,x=row)
+                        fig.write_html("static/plotly_graph.html",default_height=420)
                 return JsonResponse(
-                    {"status": "success", "data": data, "graphDetails": graphDetails, "table_html": table_html}
-                )
+                {"status": "success", "data": data, 'data_json': data_json,
+                    "graphDetails": graphDetails,'plotly_graph_exists':plotly_graph_exists()}
+            )
             # Create a DataFrame using the selected columns and data from data_json
             df = pd.DataFrame({
                 column: json.loads(data_json)[column],
                 row: json.loads(data_json)[row],  # Example data, replace with your own
             })
+
+            print(df.columns)
             fig = px.bar(df, x=column, y=row, color=column,title="%s VS %s" % (column,row))
             # fig = px.pie(df, names=column, values=row, title="%s VS %s" % (column,row))
             # fig = px.scatter(df, x=column, y=row, title="%s VS %s" % (column,row))
 
             # Write a figure into an HTML file representation 
-            fig.write_html("static/plotly_graph.html")
+            fig.write_html("static/plotly_graph.html",default_height=420)
 
             # Generate an HTML representation of the Plotly figure
             # fig.show()
@@ -171,6 +184,8 @@ def workpage(request):
                 status=400,
             )
     return render(request, "workpage.html", {"data": data, 'data_json': data_json, "graphDetails": graphDetails,'plotly_graph_exists':plotly_graph_exists})
+
+
 
 import os
 def plotly_graph_exists():
@@ -205,9 +220,25 @@ def createTable(data_json_str, desired_key):
         
         table_html += "<tr>"
         table_html += "<td>" + desired_key + "</td>"
-        table_html += "<td>" + json.dumps(data_json_str) + "</td>"
+        table_html += "<td>" + json.dumps(unique(data_json_str)) + "</td>"
         table_html += "</tr>"
         table_html += "</table>"
         return table_html
     except json.JSONDecodeError:
         return "<p>Error: Invalid JSON data</p>"
+    
+
+def unique(list1):
+ 
+    # insert the list to the set
+    list_set = set(list1)
+    # convert the set to the list
+    unique_list = (list(list_set))
+    return unique_list
+
+
+
+
+
+    
+    

@@ -15,10 +15,9 @@
     box-sizing: border-box;
     -ms-flex: 1 1;
     flex: 1 1;
-    background-color: #f3f0ec;
-    overflow-y: auto;
-    overflow-x: hidden;
-    position: relative;
+    background: linear-gradient(to bottom, #a5a4aa, #016a86, #016a86);
+    background-position: center;
+    background-size: cover;
   }
   
   
@@ -62,6 +61,16 @@
     display: flex;
     align-items: center;
     gap: 20px;
+  }
+
+  .container-box{
+    text-align: center;
+    border: 1px solid white;
+    background-color: white;
+    border-radius: 22px;
+    padding: 1px 50px 20px 50px;
+    margin: 30px auto;
+    width: 28%;
   }
   
   .section-card{
@@ -112,7 +121,7 @@
     min-height: 80px;
     box-sizing: border-box;
     background: #e5322d;
-    padding: 24px 56px;
+    padding: 35px 56px;
     font-weight: 600;
     font-size: 28px;
     line-height: 32px;
@@ -151,6 +160,9 @@
     height: 60px;
     cursor: pointer;
   
+  }
+  .generate__btn:hover{
+    background-color: black;
   }
   .main{
     width: 100%;

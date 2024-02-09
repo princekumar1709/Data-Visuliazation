@@ -13,26 +13,41 @@
   <body>
     <div class="tableau-container">
       <div class="draggable-container sidebar">
+        <div class="dimension">Dimensions</div>
         {% for row in data %}
         <p class="shallow-draggable" draggable="true">{{row}}</p>
         {% endfor %}
       </div>
 
       <div class="main-content">
-        <div class="title-w-chips">
-          <span class="title">Columns</span>
-          <div class="chips-container input" id="columns">
-            <!-- Chips will be added here -->
-          </div>
-        </div>
-        <div class="title-w-chips">
-          <span class="title">Rows</span>
-          <div class="chips-container input" id="rows">
-            <!-- Chips will be added here -->
-          </div>
-          <!-- <div style="max-width: 600px; margin: 0 auto;border:2px solid red">
-            <canvas id="chart"></canvas>
-          </div> -->
+        <div class="inner-content">
+            <div class="input-rows">
+                <div class="title-w-chips">
+                  <span class="title">Columns</span>
+                  <div class="chips-container input" id="columns">
+                    <!-- Chips will be added here -->
+                  </div>
+                </div>
+                <div class="title-w-chips">
+                  <span class="title">Rows</span>
+                  <div class="chips-container input" id="rows">
+                    <!-- Chips will be added here -->
+                  </div>
+                  <!-- <div style="max-width: 600px; margin: 0 auto;border:2px solid red">
+                    <canvas id="chart"></canvas>
+                  </div> -->
+                </div>
+            </div>
+            <div class="dropdown">
+                <button onclick="toggleDropdown()" class="dropbtn">Select Chart Type</button>
+                <div id="chartDropdown" class="dropdown-content">
+                  <button onclick="selectChart('scatter')"><img src="{% static 'img/scatter.png' %}" width="100%" height="30px"></button>
+                  <button onclick="selectChart('bar')"><img src="{% static 'img/bar-chart.png' %}" width="100%" height="30px"></button>
+                  <button onclick="selectChart('pie')"><img src="{% static 'img/pie-chart.png' %}" width="100%" height="30px"></button>
+                  <button onclick="selectChart('histogram')"><img src="{% static 'img/histogram.png' %}" width="100%" height="30px"></button>
+                  <button onclick="selectChart('box')"><img src="{% static 'img/box.png' %}" width="100%" height="30px"></button>
+                </div>
+              </div>
         </div>
         <div id="table-container"></div>
      
@@ -49,7 +64,7 @@
       document.addEventListener("DOMContentLoaded", () => {
           const draggables = document.querySelectorAll(".shallow-draggable");
           const containers = document.querySelectorAll(".chips-container.input");
-          const tableContainer = document.getElementById("table-container");
+          const tableContainer = document.getElementById("iframe-container");
           const iframeContainer = document.getElementById("iframe-container");
           const data = JSON.parse('{{ data_json | safe }}');
           var labels, graphData;

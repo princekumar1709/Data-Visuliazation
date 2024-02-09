@@ -36,24 +36,26 @@
     <div class="website-contents"></div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <section>
-            <div class="tool__header">
-                <h1 class="tool__header__title">To Start!</h1>
+        <div class="container-box">
+            <section>
+                <div class="tool__header">
+                    <h1 class="tool__header__title">Let's Start!</h1>
+                </div>
+                <div class="header-content">
+                    <h1>Choose Your File</h1>
+                </div>
+                <label class="uploader__btn" for="file">
+                    <span>Select XLS file</span>
+                </label>
+            </section>
+            <input id="file" type="file" class="hidden" accept=" .xls ,.xlsx" name="xls_file" required>
+            <div class="main">
+                <button class="generate__btn" name="view_data">&nbsp;View Data&nbsp;&nbsp;&nbsp;<img src="{% static 'img/database.png' %}" width="40px" height="40px">&nbsp;</button><br><br>
+                <button class="generate__btn" name="see_report">View Report&nbsp;&nbsp;<img src="{% static 'img/report-48.png' %}" width="40px" height="40px"></button><br><br>
+                <button class="generate__btn" name="generate_graphs">View Graphs <img src="{% static 'img/innovation.svg' %}" width="50px" height="40px"></button>
             </div>
-            <div class="header-content">
-                <h1>Choose Your File</h1>
-            </div>
-            <label class="uploader__btn" for="file">
-                <span>Select XLS file</span>
-            </label>
-        </section>
-        <input id="file" type="file" class="hidden" accept=" .xls ,.xlsx" name="xls_file" required>
-        <div class="main">
-            <button class="generate__btn" name="view_data">View Data&nbsp;&nbsp; <img src="{% static 'img/database.png' %}" width="40px" height="40px"></button><br><br>
-            <button class="generate__btn" name="see_report">See Report&nbsp;&nbsp;<img src="{% static 'img/report-48.png' %}" width="40px" height="40px"></button><br><br>
-            <button class="generate__btn" name="generate_graphs">Generate Graph <img src="{% static 'img/innovation.svg' %}" width="50px" height="40px"></button>
+        </form>
         </div>
-    </form>
 
     {% comment %} <div class="loader"></div> {% endcomment %}
 
