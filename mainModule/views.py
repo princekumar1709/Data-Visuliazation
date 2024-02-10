@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from ydata_profiling import ProfileReport
 import numpy as np
 import plotly.express as px
+import plotly.graph_objects as go
 
 # Create your views here.
 # @login_required
@@ -158,26 +159,30 @@ def workpage(request):
                     "graphDetails": graphDetails,'plotly_graph_exists':plotly_graph_exists()}
             )
             # Create a DataFrame using the selected columns and data from data_json
-            df = pd.DataFrame({
-                column: json.loads(data_json)[column],
-                row: json.loads(data_json)[row],  # Example data, replace with your own
-            })
+            if column is not None and row is not None:
+                df = pd.DataFrame({
+                    column: json.loads(data_json)[column],
+                    row: json.loads(data_json)[row],  # Example data, replace with your own
+                    })
+                if ((type(df[column][0]) in [np.float64,np.float32,np.int32,np.int64]) & (type(df[row][0]) in [np.float64,np.float32,np.int32,np.int64])):
+                    fig=px.scatter(df,x=column,y=row)
+                elif((type(df[column][0]) in [str]) & (type(df[row][0]) in [np.float64,np.float32,np.int32,np.int64])):
+                    fig=px.bar(df,x=column,y=row)
+                elif((type(df[column][0]) in [np.float64,np.float32,np.int32,np.int64]) & (type(df[row][0]) in [str])):
+                    print('done')
+                    fig=px.bar(df,x=row,y=column)
+                else:
+                    fig=go.Figure(data=go.Heatmap(x=df[column] ,y=df[row]),z=data)
 
-            print(df.columns)
-            fig = px.bar(df, x=column, y=row, color=column,title="%s VS %s" % (column,row))
-            # fig = px.pie(df, names=column, values=row, title="%s VS %s" % (column,row))
-            # fig = px.scatter(df, x=column, y=row, title="%s VS %s" % (column,row))
-
-            # Write a figure into an HTML file representation 
-            fig.write_html("static/plotly_graph.html",default_height=420)
+                fig.write_html("static/plotly_graph.html",default_height=420)
 
             # Generate an HTML representation of the Plotly figure
             # fig.show()
 
-            return JsonResponse(
-                {"status": "success", "data": data, 'data_json': data_json,
+                return JsonResponse(
+                    {"status": "success", "data": data, 'data_json': data_json,
                     "graphDetails": graphDetails,'plotly_graph_exists':plotly_graph_exists()}
-            )
+                )
         except json.JSONDecodeError:
             return JsonResponse(
                 {"status": "error", "message": "Invalid JSON format in the request."},
@@ -235,8 +240,6 @@ def unique(list1):
     # convert the set to the list
     unique_list = (list(list_set))
     return unique_list
-
-
 
 
 
