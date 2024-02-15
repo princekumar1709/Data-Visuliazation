@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from ydata_profiling import ProfileReport
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
+import re
 
 # Create your views here.
 # @login_required
@@ -125,8 +125,11 @@ def workpage(request):
     graphDetails = {}
 
     if request.method == "POST":
+        lis=[rq for rq in request.POST]
+        print('lis  :', lis)
         try:
             body_unicode = request.body.decode("utf-8")
+            print(body_unicode)
             data = json.loads(body_unicode)
             # draggable data
             graphDetails = data.get("data")
@@ -135,25 +138,34 @@ def workpage(request):
 
             column = getFilteredValue(graphDetails, desired_column)
             row = getFilteredValue(graphDetails, desired_row)
-
+        
             if column is None or row is None:
                 # Either column or row is not present; show a table instead
                 if(column):
                     df=pd.DataFrame({column:json.loads(data_json)[column]})
                     if type(df[column][0]) in [np.float64,np.float32,np.int32,np.int64]:
-                        fig=px.histogram(data_frame=df,x=column)
-                        fig.write_html("static/plotly_graph.html",default_height=420)
+                        if 'box' in request:
+                            px.box(data_frame=df,x=column)
+                        # if chartType=="kde":
+                        #     px.box(data_frame=df,x=column)
+                        else:
+                            fig=px.histogram(data_frame=df,x=column,nbins=10,title='Distribution of %s'%(column))
                     else:
-                        fig=px.bar(data_frame=df,x=column)
-                        fig.write_html("static/plotly_graph.html",default_height=420)
+                        fig=px.bar(x=df[column].sort_values().unique(),y=df.groupby(column)[column].value_counts().values,color=df[column].unique(),text_auto=True,title='Distribution of %s'%(column))
+                        fig.update_traces(width=0.4)
+                        fig.update_layout(xaxis_title=column, yaxis_title='Counts')
+                        
                 else:
                     df=pd.DataFrame({row:json.loads(data_json)[row]})
                     if type(df[row][0]) in [np.float64,np.float32,np.int32,np.int64]:
-                        fig=px.histogram(data_frame=df,x=row)
-                        fig.write_html("static/plotly_graph.html",default_height=420)
+                        fig=px.histogram(data_frame=df,x=row,nbins=10,title='Distribution of %s'%(row))
+                        
                     else:
-                        fig=px.bar(data_frame=df,x=row)
-                        fig.write_html("static/plotly_graph.html",default_height=420)
+                        fig=px.bar(x=df[row].sort_values().unique(),y=df.groupby(row)[row].value_counts().values,color=df[row].unique(),text_auto=True,title='Distribution of %s'%(row))
+                        fig.update_traces(width=0.4)
+                        fig.update_layout(xaxis_title=row, yaxis_title='Counts')
+                # fig.update_traces(width=0.4)   
+                fig.write_html("static/plotly_graph.html",default_height=420)
                 return JsonResponse(
                 {"status": "success", "data": data, 'data_json': data_json,
                     "graphDetails": graphDetails,'plotly_graph_exists':plotly_graph_exists()}
@@ -165,14 +177,20 @@ def workpage(request):
                     row: json.loads(data_json)[row],  # Example data, replace with your own
                     })
                 if ((type(df[column][0]) in [np.float64,np.float32,np.int32,np.int64]) & (type(df[row][0]) in [np.float64,np.float32,np.int32,np.int64])):
-                    fig=px.scatter(df,x=column,y=row)
+                    fig=px.scatter(df,x=column,y=row,title='%s VS %s' %(column,row))
+
                 elif((type(df[column][0]) in [str]) & (type(df[row][0]) in [np.float64,np.float32,np.int32,np.int64])):
-                    fig=px.bar(df,x=column,y=row)
+                    fig=px.bar(df,x=df[column].sort_values().unique(),y=df.groupby(column)[row].sum().values,color=df[column].unique(),title='%s VS %s' %(column,row))
+                    fig.update_traces(width=0.4)
+                    fig.update_layout(xaxis_title=column, yaxis_title=row)
+
                 elif((type(df[column][0]) in [np.float64,np.float32,np.int32,np.int64]) & (type(df[row][0]) in [str])):
-                    print('done')
-                    fig=px.bar(df,x=row,y=column)
+                    fig=px.bar(df,x=df[row].sort_values().unique(),y=df.groupby(row)[column].sum().values,color=df[row].unique(),title='%s VS %s' %(row,column))
+                    fig.update_traces(width=0.4)
+                    fig.update_layout(xaxis_title=row, yaxis_title=column)
                 else:
-                    fig=go.Figure(data=go.Heatmap(x=df[column] ,y=df[row]),z=data)
+                    # fig=go.Figure(data=go.Heatmap(x=df[column] ,y=df[row]),z=data)
+                    fig=px.bar(data_frame=df,x=df[column].unique(),y=df[column].value_counts().values,color=df[row].unique())
 
                 fig.write_html("static/plotly_graph.html",default_height=420)
 

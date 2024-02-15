@@ -15,7 +15,7 @@
       <div class="draggable-container sidebar">
         <div class="dimension">Dimensions</div>
         {% for row in data %}
-        <p class="shallow-draggable" draggable="true">{{row}}</p>
+                <p class="shallow-draggable" draggable="true">{{row}}</p>
         {% endfor %}
       </div>
 
@@ -40,13 +40,17 @@
             </div>
             <div class="dropdown">
                 <button onclick="toggleDropdown()" class="dropbtn">Select Chart Type</button>
-                <div id="chartDropdown" class="dropdown-content">
-                  <button onclick="selectChart('scatter')"><img src="{% static 'img/scatter.png' %}" width="100%" height="30px"></button>
-                  <button onclick="selectChart('bar')"><img src="{% static 'img/bar-chart.png' %}" width="100%" height="30px"></button>
-                  <button onclick="selectChart('pie')"><img src="{% static 'img/pie-chart.png' %}" width="100%" height="30px"></button>
-                  <button onclick="selectChart('histogram')"><img src="{% static 'img/histogram.png' %}" width="100%" height="30px"></button>
-                  <button onclick="selectChart('box')"><img src="{% static 'img/box.png' %}" width="100%" height="30px"></button>
-                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div id="chartDropdown" class="dropdown-content">
+                        <button onclick="selectChart('scatter')" name="scatter"><img src="{% static 'img/scatter.png' %}" width="100%" height="30px"></button>
+                        <button onclick="selectChart('bar')" name="bar"><img src="{% static 'img/bar-chart.png' %}" width="100%" height="30px"></button>
+                        <button onclick="selectChart('pie')" name="pie"><img src="{% static 'img/pie-chart.png' %}" width="100%" height="30px"></button>
+                        <button onclick="selectChart('hist')" name="hist"><img src="{% static 'img/histogram.png' %}" width="100%" height="30px"></button>
+                        <button onclick="selectChart('box')" name="box"><img src="{% static 'img/box.png' %}" width="100%" height="30px"></button>
+                        <button onclick="selectChart('kde')" name="kde"><img src="{% static 'img/kde.png' %}" width="100%" height="30px"></button>
+                    </div>
+                </form>
               </div>
         </div>
         <div id="table-container"></div>
@@ -60,7 +64,22 @@
     </div>
     </div>
     <!-- <script src="{% static 'js/script.js' %}"></script> -->
-    <script>
+    <script> 
+        function selectChart(chartType) {
+            // Gather the dropped field data
+            const graphDetails = getGraphDetailsFromPage();
+            // Save the graph details along with the chart type
+            saveGraphDetails(graphDetails, chartType);
+        }
+        
+        function getGraphDetailsFromPage() {
+            const draggables = document.querySelectorAll(".shallow-draggable");
+            const graphDetails = [];
+            draggables.forEach((draggable) => {
+                graphDetails.push({ value: draggable.innerText });
+            });
+            return graphDetails;
+        }   
       document.addEventListener("DOMContentLoaded", () => {
           const draggables = document.querySelectorAll(".shallow-draggable");
           const containers = document.querySelectorAll(".chips-container.input");
@@ -168,7 +187,7 @@
               // Update chart
 
           }
-
+ 
           function saveGraphDetails(graphDetails) {
               // Make the POST request to save graphDetails
               fetch("/workpage", {
@@ -177,7 +196,7 @@
                       "Content-Type": "application/json",
                       "X-CSRFToken": getCSRFToken(),
                   },
-                  body: JSON.stringify({ data: graphDetails }),
+                  body: JSON.stringify({ data: graphDetails}),
               })
                   .then((response) => response.json())
                   .then((data) => {
