@@ -39,18 +39,15 @@
                 </div>
             </div>
             <div class="dropdown">
-                <button onclick="toggleDropdown()" class="dropbtn">Select Chart Type</button>
-                <form method="post">
-                    {% csrf_token %}
+                <button class="dropbtn">Select Chart Type</button>
                     <div id="chartDropdown" class="dropdown-content">
-                        <button onclick="selectChart('scatter')" name="scatter"><img src="{% static 'img/scatter.png' %}" width="100%" height="30px"></button>
-                        <button onclick="selectChart('bar')" name="bar"><img src="{% static 'img/bar-chart.png' %}" width="100%" height="30px"></button>
-                        <button onclick="selectChart('pie')" name="pie"><img src="{% static 'img/pie-chart.png' %}" width="100%" height="30px"></button>
-                        <button onclick="selectChart('hist')" name="hist"><img src="{% static 'img/histogram.png' %}" width="100%" height="30px"></button>
-                        <button onclick="selectChart('box')" name="box"><img src="{% static 'img/box.png' %}" width="100%" height="30px"></button>
-                        <button onclick="selectChart('kde')" name="kde"><img src="{% static 'img/kde.png' %}" width="100%" height="30px"></button>
+                        <button id="graph1" value="scatter"><img src="{% static 'img/scatter.png' %}" width="100%" height="30px"></button>
+                        <button id="graph2" value="bar"><img src="{% static 'img/bar-chart.png' %}" width="100%" height="30px"></button>
+                        <button id="graph3" value="pie"><img src="{% static 'img/pie-chart.png' %}" width="100%" height="30px"></button>
+                        <button id="graph4" value="hist"><img src="{% static 'img/histogram.png' %}" width="100%" height="30px"></button>
+                        <button id="graph5" value="box"><img src="{% static 'img/box.png' %}" width="100%" height="30px"></button>
+                        <button id="graph6" value="kde"><img src="{% static 'img/kde.png' %}" width="100%" height="30px"></button>
                     </div>
-                </form>
               </div>
         </div>
         <div id="table-container"></div>
@@ -64,22 +61,8 @@
     </div>
     </div>
     <!-- <script src="{% static 'js/script.js' %}"></script> -->
-    <script> 
-        function selectChart(chartType) {
-            // Gather the dropped field data
-            const graphDetails = getGraphDetailsFromPage();
-            // Save the graph details along with the chart type
-            saveGraphDetails(graphDetails, chartType);
-        }
-        
-        function getGraphDetailsFromPage() {
-            const draggables = document.querySelectorAll(".shallow-draggable");
-            const graphDetails = [];
-            draggables.forEach((draggable) => {
-                graphDetails.push({ value: draggable.innerText });
-            });
-            return graphDetails;
-        }   
+    <script>
+           
       document.addEventListener("DOMContentLoaded", () => {
           const draggables = document.querySelectorAll(".shallow-draggable");
           const containers = document.querySelectorAll(".chips-container.input");
@@ -89,10 +72,7 @@
           var labels, graphData;
 
           let chartInstance = null;
-          <!-- let ctx = document.getElementById("chart").getContext("2d"); -->
-
           let graphDetails = [];
-
           let isDragging = false;
           let draggingElement;
           let activeContainer = null;
@@ -120,6 +100,31 @@
                   }
               });
           });
+
+          
+          document.getElementById("graph").addEventListener("click", (e) => {
+            const chartType = e.target.value;
+            const graphDetails = getGraphDetailsFromPage();
+            console.log(graphDetails);
+            saveGraphDetails(graphDetails, chartType);
+          });
+          
+        function selectChart(chartType) {
+            // Gather the dropped field data
+            const graphDetails = getGraphDetailsFromPage();
+            console.log(graphDetails)
+            // Save the graph details along with the chart type
+            saveGraphDetails(graphDetails, chartType);
+        }
+        
+        function getGraphDetailsFromPage() {
+            const draggables = document.querySelectorAll(".shallow-draggable");
+            const graphDetails = [];
+            draggables.forEach((draggable) => {
+                graphDetails.push({ value: draggable.innerText });
+            });
+            return graphDetails;
+        }
 
           function handleDropEvent(e) {
               e.preventDefault();
@@ -188,7 +193,7 @@
 
           }
  
-          function saveGraphDetails(graphDetails) {
+          function saveGraphDetails(graphDetails,chartType) {
               // Make the POST request to save graphDetails
               fetch("/workpage", {
                   method: "POST",
@@ -196,7 +201,7 @@
                       "Content-Type": "application/json",
                       "X-CSRFToken": getCSRFToken(),
                   },
-                  body: JSON.stringify({ data: graphDetails}),
+                  body: JSON.stringify({ data: graphDetails, chartType: chartType}),
               })
                   .then((response) => response.json())
                   .then((data) => {
@@ -229,7 +234,7 @@
                   return csrfCookie.split("=")[1];
               }
               return "";
-          }
+          } 
 
           function createChipElement(text) {
               const chip = document.createElement("div");
